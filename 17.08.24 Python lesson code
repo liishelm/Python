@@ -1,0 +1,69 @@
+import pandas as pd
+advertising = pd.read_csv('/tvmarketing.csv')
+advertising.head()
+
+
+advertising.describe()
+
+import seaborn as sns
+sns.regplot(
+    data=advertising,
+    x='TV',
+    y="Sales",
+    ci=99,
+    marker="x",
+    color="black",
+    line_kws=dict(color="green"))
+
+advertising.corr() 
+
+
+advertising['TV'].corr(advertising['Sales'])   
+0.7822244248616061
+
+
+X = advertising.drop('Sales', axis=1)
+X.head()
+
+
+Y=advertising.drop('TV', axis=1)
+Y.head()
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, Y, train_size = 0.7, random_state=42)
+
+
+X_train
+
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+
+
+### Y=mX + b ###
+print(f'Model intercept: {model.intercept_}')
+print(f'Model coefficient: {model.coef_}')
+Model intercept: [7.23945983]
+Model coefficient: [[0.0464078]]
+
+my_new_budget = [[2000]]
+my_predicted_sales = model.predict(my_new_budget)
+print(f'When the new budget is {my_new_budget[0][0]}, then predicted sales are {my_predicted_sales[0][0]}')
+When the new budget is 2000, then predicted sales are 100.05506408705668
+/usr/local/lib/python3.10/dist-packages/sklearn/base.py:465: UserWarning: X does not have valid feature names, but LinearRegression was fitted with feature names
+  warnings.warn(
+
+
+X_test.head()
+y_pred = model.predict(X_test)
+
+final_df = pd.DataFrame()
+final_df['TV'] = X_test
+final_df['Actual_sales'] = y_test
+final_df['Predicted_sales'] = y_pred
+final_df.head()
+
+
+final_df['ABS_error_Actual_vs_Predicted'] = abs(final_df['Actual_sales'] - final_df['Predicted_sales'])
+final_df.head()
